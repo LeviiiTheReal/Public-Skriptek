@@ -1,1 +1,561 @@
+# ================== NOTE ================== #
+#   This skript was coded by VarusOfficial   #
+#  Please don't claim this as your own work  #
+# ========================================== #
+
+#-------------- SKRIPT --------------# 
+
+options:
+    prefix: &3&lChatCare &8»
+    fprefix: &eFilter &8»
+    version: &fRELEASE 1.0
+    bcprefix: &3Broadcast &8»
+
+variables:
+    {chc.language.ENG} = "true"
+    {chc.language.HUN} = "false"
+    {chc.mutechat} = "false"
+
+on chat:
+    if {chc.mutechat} is true:
+        if {chc.language.ENG} is true:
+            cancel event
+            send "{@prefix} &7The chat is currently muted!" to player
+        else:
+            cancel event
+            send "{@prefix} &7A chat le lett zárva!" to player
+
+
+    loop {filter.words::*}:
+        if message contain "%loop-value%":
+            cancel event
+            if {chc.language.ENG} is true:
+                send player title "&cPlease do not use" with subtitle "&cobscene words!" for 0.7 seconds
+                set {filter.blockwords.Said::%player%::*} to true
+            else:
+                send player title "&cKérlek ne használj" with subtitle "&ctárgár szavakat!" for 0.7 seconds
+                set {filter.blockwords.Said::%player%::*} to true
+        if {filter.blockwords.Said::%player%::*} is true:
+            loop all players:
+                if {chc.notify::%loop-player%} is true:
+                    send "&8[&7Swear/ID&8] &7%player%: &f%colored message%"
+        clear {filter.blockwords.Said::%player%::*}
+
+command /chatcare:chatcare:
+    aliases: /chatcare, /chc, /chatcare:chc
+    trigger:
+        if player has permission "chatcare.admin.help":
+            if {chc.language.ENG} is true:
+                send "&a "
+                json("%player%", "&3&l  ChatCare|| &f{@version}||ttp:&7Creator: &fVarusOfficial||")
+                send "  &2[] &7= &foptional argument (use only 1 at once)"
+                send "  &6<> &7= &frequire argument"
+                send "&b "
+                send "  &f/chcreload &7- &eReload skript." 
+                send "  &f/filter &7- &eShow filter commands." 
+                send "  &f/chcclear &2[reason] &7- &eChat clear." 
+                json("%player%", "  &7Next Page >>||cmd:/chc2||")
+                send "&c "
+            else:
+                send "&1 "
+                json("%player%", "&3&l  ChatCare|| &f{@version}||ttp:&7Készítő: &fVarusOfficial||")
+                send "  &2[] &7= &fválaszható argument (csak 1-et használj)"
+                send "  &6<> &7= &fszükséges argument"
+                send "&2 "
+                send "  &f/chcreload &7- &eSkript újratöltése."
+                send "  &f/filter &7- &eFilter parancsok."
+                send "  &f/chcclear &2[indok] &7- &eChat törlése."
+                json("%player%", "  &7Kövektező Oldal >>||cmd:/chc2||")
+                send "&3 "
+        else:
+            if {chc.language.ENG} is true:
+                send "{@prefix} &cYou do not have permission to do this!"
+            else:
+                send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+command /chatcare:chatcare2:
+    aliases: /chc2
+    trigger:
+        if player has permission "chatcare.admin.help":
+            if {chc.language.ENG} is true:
+                send "&a "
+                send "  &f/chcsetlang &6<english/hungarian> &7- &eSet language."
+                send "  &f/chcfake &6<join/leave> &2[name] &7- &eFake join/quit message."
+                send "  &f/chcbroadcast &6<message> &7- &eBroadcast your message."
+                send "  &f/chcmute &6<on/off> &7&o soon [reason] &7- &eChat (un)mute." 
+                json("%player%", "   &7<< Previous Page||cmd:/chc||")
+                send "&c "
+            else:
+                send "&1"
+                send "  &f/chcsetlang &6<english/hungarian> &7- &eNyelv beállítása."
+                send "  &f/chcfake &6<join/leave> &2[név] &7- &eKamu be- és kilelépés üzenet."
+                send "  &f/chcbroadcast &6<szöveg> &7- &eÜzenet közvetítése."
+                send "  &f/chcmute &6<on/off> &7&o hamarosan [indok] &7- &eChat (be)kikpacsolás."
+                json("%player%", "   &7<< Előző Oldal||cmd:/chc||")
+                send "&3 "
+        else:
+            if {chc.language.ENG} is true:
+                send "{@prefix} &cYou do not have permission to do this!"
+            else:
+                send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+command /chatcare:broadcast [<text>]:
+    aliases: /broadcast, /chc:broadcast, /chcbroadcast, /bc, /chatcare:bc, /chc:bc
+    trigger:
+        if player has permission "chatcare.admin.broadcast":
+            if {chc.language.ENG} is true:
+                if arg 1 is not set:
+                    send "{@prefix} &7Usage: &b/broadcast &6<message>"
+                else:
+                    broadcast "{@bcprefix} &7%colored arg-1%"
+
+            else:
+                if arg 1 is not set:
+                    send "{@prefix} &7Használd: &b/broadcast &6<szöveg>"
+                else:
+                    broadcast "{@bcprefix} &7%colored arg-1%"
+
+        else:
+            if {chc.language.ENG} is true:
+                send "{@prefix} &cYou do not have permission to do this!"
+            else:
+                send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+
+command /chatcare:language [<text>]:
+    aliases: /chatcare:setlanguage, /language, /setlanguage, /setlang, /chcsetlang
+    executable by: players
+    trigger:
+        if player has permission "chc.admin.language":
+            if {chc.language.ENG} is true:
+                if arg 1 is not set:
+                    send "{@prefix} &7Usage:&c /language <english ┃ hungarian>"
+            else:
+                if arg 1 is not set:
+                    send "{@prefix} &7Használd: &c/language <english ┃ hungarian>"
+
+            if arg 1 is "Eng" or "English":
+                if {chc.language.ENG} is true:
+                    send "{@prefix} &cThis language is currently selected! &7( &9&lE&f&ln&4&lgli&f&ls&9&lh &7)"
+                else:
+                    set {chc.language.HUN} to false
+                    set {chc.language.ENG} to true
+                    send "{@prefix} &9&lE&f&ln&4&lgli&f&ls&9&lh &7language selected successfully!"
+
+            else if arg 1 is "Hun" or "Hungarian":
+                if {chc.language.HUN} is true:
+                    send "{@prefix} &cJelenleg ez a nyelv van kiválasztva! &7( &c&lHun&f&lgar&2&lian &7)"
+                else:
+                    set {chc.language.HUN} to true
+                    set {chc.language.ENG} to false
+                    send "{@prefix} &c&lHun&f&lgar&2&lian &7nyelv sikeresen kiválasztva!"        
+        else:
+            if {chc.language.ENG} is true:
+                send "{@prefix} &cYou do not have permission to do this!"
+            else:
+                send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+command /chatcare:chatmute [<text>] [<text>]:
+    aliases: /chatcare:mutechat, /chc:chatmute, /chc:mutechat, /mutechat, /chatmute, /chcmute
+    trigger:
+        if player has permission "chatcare.admin.chatmute":
+            if arg 1 is not set:
+                if arg 2 is not set:
+                    if {chc.language.ENG} is true:
+                        send "{@prefix} &7Usage: &b/chatmute &6<on/off> &7&o soon [reason]"
+                    else:
+                        send "{@prefix} &7Használd: &b/chatmute &6<on/off> &7&o hamarosan [indok]"
+            
+            if {chc.language.ENG} is true:
+                if arg 1 is "on":
+                    if arg 2 is set:
+                        set {chc.mutechat} to true
+                        wait 1 tick
+                        broadcast "{@prefix} &7The chat was muted by &b%player%&7! Reason &b%arg 2%"
+                    else:
+                        set {chc.mutechat} to true
+                        wait 1 tick
+                        broadcast "{@prefix} &7The chat was muted by &b%player%&7!"
+
+                else if arg 1 is "off":
+                    if arg 2 is set:
+                        wait 1 tick
+                        broadcast "{@prefix} &7Usage: &b/chatmute &6off"
+                    else:
+                        set {chc.mutechat} to false
+                        wait 1 tick
+                        broadcast "{@prefix} &7The chat was unmuted by &b%player%&7!"
+            else:
+                if arg 1 is "on":
+                    if arg 2 is set:
+                        set {chc.mutechat} to true
+                        wait 1 tick
+                        broadcast "{@prefix} &7A chat le lett zárva &b%player%&7 által! Indok: &b%arg 2%"
+                    else:
+                        set {chc.mutechat} to true
+                        wait 1 tick
+                        broadcast "{@prefix} &7A chat le lett zárva &b%player%&7!"
+
+                else if arg 1 is "off":
+                    if arg 2 is set:
+                        wait 1 tick
+                        broadcast "{@prefix} &7Használd: &b/chatmute &6off"
+                    else:
+                        set {chc.mutechat} to false
+                        wait 1 tick
+                        broadcast "{@prefix} &7A chat zárolása fel lett oldva &b%player%&7 által!"
+
+        else:
+            if {chc.language.ENG} is true:
+                send "{@prefix} &cYou do not have permission to do this!"
+            else:
+                send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+command /chatcare:chatclear [<text>]:
+    aliases: /chc:cc, /chatclear, /chatcare:cc, /chcclear
+    trigger:
+        if player has permission "chatcare.admin.chatclear":
+            if {chc.language.ENG} is true:
+                if arg 1 is set:
+                    loop 100 times:
+                        broadcast ""
+                    wait 0.5 second
+                    loop all players:
+                        send loop-player title "&7The chat was cleared" with subtitle "&7by &b%player%&7! Reason &b%arg 1%&7." for 1.5 seconds
+                else:
+                    loop 100 times:
+                        broadcast ""
+                    wait 0.5 second
+                    loop all players:
+                        send loop-player title "&7The chat was cleared" with subtitle "&7by &b%player%&7!" for 1.5 seconds
+            else:
+                if arg 1 is set:
+                    loop 100 times:
+                        broadcast ""
+                    wait 0.5 second
+                    loop all players:
+                        send loop-player title "&7Chat törölve lett" with subtitle "&b%player%&7 által! Indok: &b%arg 1%&7." for 1.5 seconds
+                else:
+                    loop 100 times:
+                        broadcast ""
+                    wait 0.5 second
+                    loop all players:
+                        send loop-player title "&7Chat törölve lett" with subtitle "&b%player%&7 által!" for 1.5 seconds
+        
+        else:
+            if {chc.language.ENG} is true:
+                send "{@prefix} &cYou do not have permission to do this!"
+            else:
+                send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+command /chatcare:fake [<text>] [<text>]:
+    aliases: /fake, /chc:fake, /chcfake
+    trigger:
+        if player has permission "chc.admin.fakemessage":
+            if arg 1 is not set:
+                if arg 2 is not set:
+                    if {chc.language.ENG} is true:
+                        send "{@prefix} &7Usage: &b/chcfake &6<join/leave> &2[name]"
+                    else:
+                        send "{@prefix} &7Használd: &b/chcfake &6<join/leave> &2[name]"
+            
+            if arg 1 is "join":
+                if player has permission "chc.admin.fakejoin":
+                    if {chc.language.ENG} is true:
+                        if arg 2 is number:
+                            send "{@prefix} &7Please don't use number! Use the fake player name."
+                        else:
+                            send "{@prefix} &7Createing a fake message..."
+                            wait 0.5 second
+                            send "{@prefix} &7Set the arguments..."
+                            wait 1 second
+                            broadcast "&e%arg 2% joined the game"
+                    else:
+                        if arg 2 is number:
+                            send "{@prefix} &7Kérlek ne használj számot! Használj egy kamu játékosnevet."
+                        else:
+                            send "{@prefix} &7Kamu üzenet generálása folyamatban..."
+                            wait 0.5 second
+                            send "{@prefix} &7Argumentuok beállítása..."
+                            wait 1 second
+                            broadcast "&e%arg 2% joined the game"
+                else:
+                    if {chc.language.ENG} is true:
+                        send "{@prefix} &cYou do not have permission to do this!"
+                    else:
+                        send "{@prefix} &cEhhez nincs jogosultságod!"
+
+            else if arg 1 is "leave":
+                if player has permission "chc.admin.fakeleave":
+                    if {chc.language.ENG} is true:
+                        if arg 2 is number:
+                            send "{@prefix} &7Please don't use number! Use the fake player name."
+                        else:
+                            send "{@prefix} &7Createing a fake message..."
+                            wait 0.5 second
+                            send "{@prefix} &7Set the arguments..."
+                            wait 1 second
+                            broadcast "&e%arg 2% left the game."
+                    else:
+                        if arg 2 is number:
+                            send "{@prefix} &7Kérlek ne használj számot! Használj egy kamu játékosnevet."
+                        else:
+                            send "{@prefix} &7Kamu üzenet generálása folyamatban..."
+                            wait 0.5 second
+                            send "{@prefix} &7Argumentuok beállítása..."
+                            wait 1 second
+                            broadcast "&e%arg 2% left the game."
+                else:
+                    if {chc.language.ENG} is true:
+                        send "{@prefix} &cYou do not have permission to do this!"
+                    else:
+                        send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        else:
+            if {chc.language.ENG} is true:
+                send "{@prefix} &cYou do not have permission to do this!"
+            else:
+                send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+command /chatcare:ccreload:
+    aliases: /chc:reload, /chcreload, /chcrl
+    trigger:
+        if player has permission "chc.admin.reload":
+            if {chc.language.ENG} is true:
+                send "{@prefix} &7The skript will reload in &b10&7 seconds!"
+                wait 4.5 seconds
+                send "{@prefix} &7skript unloading..."
+                wait 4.5 second
+                send "{@prefix} &cskript successfully unloaded!"
+                wait 1 second
+                execute console command "sk reload ChatCare"
+                wait 0.5 second
+                send "{@prefix} &askript successfully loaded!"
+
+            else:
+                send "{@prefix} &7A skript &b10&7 másodperc múlva újratöltődik!"
+                wait 4.5 seconds
+                send "{@prefix} &7skript kikapcsolása..."
+                wait 4.5 second
+                send "{@prefix} &cskript sikeresen kikapcsolva!"
+                wait 1 second
+                execute console command "sk reload ChatCare"
+                wait 0.5 second
+                send "{@prefix} &askript sikeresen betöltve!"
+
+        else:
+            if {chc.language.ENG} is true:
+                send "{@prefix} &cYou do not have permission to do this!"
+            else:
+                send "{@prefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+#-------------- FILTER --------------# 
+#   Permissions:
+# /filter  > chc.filter.usage
+# /filter help  > chc.filter.help
+# /filter add <word/szó>  > chc.filter.add
+# /filter remove <word/szó>  > chc.filter.remove
+# /filter reset  > --------
+#                         I > chc.filter.reset
+# /filter resetconfirm  > -
+# /filter list  > chc.filter.list
+
+
+command /filter [<text>] [<text>]:
+    trigger:
+        if player has permission "chc.filter.help":
+            if arg 1 is not set:
+                if arg 2 is not set:
+                    if {chc.language.ENG} is true:
+                        send "&0"
+                        # send "  &eFilter &f(ChatCare Add-on)"
+                        json("%player%", "&e  Filter|| &f(ChatCare Add-on)||ttp:&7Creator: &fVarusOfficial||")
+                        send "  &6<> &7= &frequire argument"
+                        send "&1"
+                        send "  &f/filter &7- &eShow this message. :)"
+                        send "  &f/filter add &6<word> &7- &eAdd word to blacklist."
+                        send "  &f/filter remove &6<word> &7- &eRemove word from blacklist."
+                        send "  &f/filter reset &7- &eReset list."
+                        send "  &f/filter resetconfirm &7- &eAccept for the reset."
+                        send "  &f/filter list &7- &eShow blocked words."
+                        send "  &f/filter notify &7- &eEnable the notify system. (personal)"
+                        send "  &7&o(Press T to see all commands.)"
+                        send "&2"
+
+                    else:
+                        send "&0"
+                        json("%player%", "&e  Filter|| &f(ChatCare Add-on)||ttp:&7Creator: &fVarusOfficial||")
+                        send "  &6<> &7= &fszükséges argument"
+                        send "&1"
+                        send "  &f/filter &7- &eEz az üzenet. :)"
+                        send "  &f/filter add &6<szó> &7- &eSzó hozzáadása a tiltólistához."
+                        send "  &f/filter remove &6<szó> &7- &eSzó eltávolítása a tiltólistáról."
+                        send "  &f/filter reset &7- &eLista törlése."
+                        send "  &f/filter resetconfirm &7- &eTörlés megerősítése."
+                        send "  &f/filter list &7- &eTiltott szavak kilistázása."
+                        send "  &f/filter notify &7- &eÉrtesítések bekapcsolása. (személyes)"
+                        send "  &7&o(Nyomd meg a T betűt, hogy lásd az összes parancsot.)"
+                        send "&2"
+
+            else if arg 1 is "add":
+                if player has permission "chc.filter.add":
+                    if arg 2 is not set:
+                        if {chc.language.ENG} is true:
+                            send "{@fprefix} &7Usage: &e/filter add &6<word>"
+                        else:
+                            send "{@fprefix} &7Használd: &e/filter add &6<szó>"
+                    else:
+                        add arg 2 to {filter.words::*}
+                        add 1 to {filter.words.size}
+                        if {chc.language.ENG} is true:
+                            send "{@fprefix} &6%arg 2% &7word added to blacklist!"   
+                        else:
+                            send "{@fprefix} &6%arg 2% &7hozzáadva a tiltólistához!"
+                else:
+                    if {chc.language.ENG} is true:
+                        send "{@fprefix} &cYou do not have permission to do this!"
+                    else:
+                        send "{@fprefix} &cEhhez nincs jogosultságod!"
+
+            else if arg 1 is "list":
+                if player has permission "chc.filter.list":
+                    if {filter.words::*} is not set:
+                        if {chc.language.ENG} is true:
+                            send "{@fprefix} &cThe list is empty! &7&o(/filter add)"
+                        else:
+                            send "{@fprefix} &cA lista üres! &7&o(/filter add)"
+
+                    else if {filter.words::*} is set:
+                        if {chc.language.ENG} is true:
+                            send "{@fprefix} &7Blocked words (&c%{filter.words.size}%&7):" 
+                            send "  &f%{filter.words::*}%"
+                        else:
+                            send "{@fprefix} &7Tiltott szavak (&c%{filter.words.size}%&7):"
+                            send "  &f%{filter.words::*}%"  
+                else:
+                    if {chc.language.ENG} is true:
+                        send "{@fprefix} &cYou do not have permission to do this!"
+                    else:
+                        send "{@fprefix} &cEhhez nincs jogosultságod!"
+
+            else if arg 1 is "remove":
+                if player has permission "chc.filter.remove":
+                    if arg 2 is not set:
+                        if {chc.language.ENG} is true:
+                            send "{@fprefix} &7Usage: &e/filter remove &6<word>"
+                        else:
+                            send "{@fprefix} &7Használd: &e/filter remove &6<szó>"
+
+                    else if arg 2 is set:
+                        loop {filter.words::*}:
+                            if arg 2 contain "%loop-value%":
+                                remove arg 2 from {filter.words::*}
+                                if {chc.language.ENG} is true:
+                                    send "{@fprefix} &6%arg 2% &7has been deleted from the list!"
+                                    remove 1 from {filter.words.size}
+                                else:
+                                    send "{@fprefix} &6%arg 2% &7törölve lett a listáról!"
+                                    remove 1 from {filter.words.size}
+                            else:
+                                if {chc.language.ENG} is true:
+                                    send "{@fprefix} &cThis word is not in the list! &7&o(/filter list)"
+                                else:
+                                    send "{@fprefix} &cEz a szó nem szerepel a listán! &7&o(/filter list)"
+                                
+                else:
+                    if {chc.language.ENG} is true:
+                        send "{@fprefix} &cYou do not have permission to do this!"
+                    else:
+                        send "{@fprefix} &cEhhez nincs jogosultságod!"
+        
+            else if arg 1 is "reset":
+                if player has permission "chc.filter.reset":
+                    if {chc.language.ENG} is true:
+                        set {reset.confirm.%player%} to true
+                        send "{@fprefix} &cAre you sure that you want to reset the list? To confirm type: &c/filter resetconfirm"
+                    else:
+                        set {reset.confirm.%player%} to true
+                        send "{@fprefix} &cBiztosan törölni szeretnéd ezt a listát? Elfogadáshoz: &c/filter resetconfirm"
+                else:
+                    if {chc.language.ENG} is true:
+                        send "{@fprefix} &cYou do not have permission to do this!"
+                    else:
+                        send "{@fprefix} &cEhhez nincs jogosultságod!"
+
+            else if arg 1 is "resetconfirm":
+                if player has permission "chc.filter.reset":
+                    if {reset.confirm.%player%} is true:
+                        if {chc.language.ENG} is true:
+                            delete {filter.words::*}
+                            delete {filter.words.size}
+                            send "{@fprefix} &cSuccessfully reset!"
+                            delete {reset.confirm.%player%}
+                        else:
+                            delete {filter.words::*}
+                            delete {filter.words.size}
+                            send "{@fprefix} &cSikeres törlés!"
+                            delete {reset.confirm.%player%}
+                    else:
+                        if {chc.language.ENG} is true:
+                            send "{@fprefix} &cIf you want to reset the list: &c/filter reset"
+                        else:
+                            send "{@fprefix} &cHa törölni szeretnéd a listát: &c/filter reset"
+                else:
+                    if {chc.language.ENG} is true:
+                        send "{@fprefix} &cYou do not have permission to do this!"
+                    else:
+                        send "{@fprefix} &cEhhez nincs jogosultságod!"
+            
+            else if arg 1 is "notify":
+                if player has permission "chc.filter.notify":
+                    if {chc.notify::%player%} is false:
+                        if {chc.language.ENG} is true:
+                            set {chc.notify::%player%} to true
+                            wait 1 tick
+                            send "{@fprefix} &7Notifications successfully&a&l enabled&7!"
+                        else:
+                            set {chc.notify::%player%} to true
+                            wait 1 tick
+                            send "{@fprefix} &7Az értesítések sikeresen &a&l be&7 lett&a&l kapcsolva&7!"
+                    else:
+                        if {chc.language.ENG} is true:
+                            set {chc.notify::%player%} to false
+                            wait 1 tick
+                            send "{@fprefix} &7Notifications successfully &c&ldisabled&7!"
+                        else:
+                            set {chc.notify::%player%} to false
+                            wait 1 tick
+                            send "{@fprefix} &7Az értesítések sikeresen &c&l ki&7 lett&c&l kapcsolva&7!"
+                else:
+                    if {chc.language.ENG} is true:
+                        send "{@fprefix} &cYou do not have permission to do this!"
+                    else:
+                        send "{@fprefix} &cEhhez nincs jogosultságod!"
+
+        else:
+            if {chc.language.ENG} is true:
+                send "{@fprefix} &cYou do not have permission to do this!"
+            else:
+                send "{@fprefix} &cEhhez nincs jogosultságod!"
+
+        stop trigger
+
+#-------------- SKRIPT --------------# 
+
 
